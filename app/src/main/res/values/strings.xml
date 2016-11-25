@@ -1,0 +1,62 @@
+<resources xmlns:xliff="http://schemas.android.com/tools">
+    <string name="app_name">Medical Reminder</string>
+    <string name="medicine_name">Medicine Name</string>
+    <string name="reminder_times">Reminder Times</string>
+    <string name="take">Take</string>
+    <string name="frequency">Frequency</string>
+    <string name="start_time">Start Time</string>
+    <string name="start_date_text">Start Date</string>
+    <string name="initial_hour">09</string>
+    <string name="initial_minute">00</string>
+    <string name="confirm_delete_dialog">Do You Want Delete Medicine?</string>
+    <string name="confirm_dialog_ok">OK</string>
+    <string name="confirm_dialog_cancel">Cancel</string>
+    <string name="dosage_text">Dosage No</string>
+    <string name="No_doses">Number Of Doses</string>
+    <string name="No_doses_description">Set number of doses to be taken in this time</string>
+    <string name="decrease"> - </string>
+    <string name="increase"> + </string>
+    <string name="set"> Set </string>
+    <string name="cancel"> Cancel </string>
+    <string name="initial_dosage">1.00</string>
+    <string name="pills">Pills</string>
+    <string name="No_days">Number Of Days</string>
+    <string name="initial_days">30</string>
+    <string name="intervals">Intervals</string>
+    <string name="schedule">Schedule</string>
+    <string name="duration">Duration</string>
+    <string name="continuous">Continuous</string>
+    <string name="no_days">Number Of Days</string>
+    <string name="days">Days</string>
+    <string name="every_day">Every day</string>
+    <string name="every_week">Every Week</string>
+    <string name="certain_days_week">Certain days of week</string>
+    <string name="every_month">Every Month</string>
+    <string-array name="intervals_array">
+        <item>Once a day</item>
+        <item>Twice a day</item>
+        <item>3 Times a day</item>
+        <item>...</item>
+    </string-array>
+    <string-array name="reminder_times_array">
+        <item>Every 24 hours</item>
+        <item>Every 12 hours</item>
+        <item>Every 8 hours</item>
+        <item>Every 6 hours</item>
+        <item>Every 4 hours</item>
+    </string-array>
+    <string-array name="days_week">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wendsday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+    <string name="medicine_empty">Medicine Name is Empty</string>
+    <string name="doses" translatable="false"><xliff:g id="date">%1.2f</xliff:g> Pills</string>
+    <string name="frequency_medicine_list" translatable="false">Every <xliff:g id="date">%2d</xliff:g> hours</string>
+    <string name="no_days_medicine_list" translatable="false"><xliff:g id="date">%d</xliff:g> days</string>
+    <string name="edit_medicine">Edit Medicine</string>
+</resources>
