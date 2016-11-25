@@ -1,5 +1,7 @@
 package apps.mai.medicalreminder.rest;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,10 +19,15 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import apps.mai.medicalreminder.EditMedicine;
 import apps.mai.medicalreminder.R;
+import apps.mai.medicalreminder.Utilities;
+import apps.mai.medicalreminder.alarm_medicine.AlarmReceiver;
 import apps.mai.medicalreminder.data.MedicineColumns;
+import apps.mai.medicalreminder.data.MedicineDaysColumns;
 import apps.mai.medicalreminder.data.MedicineProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.content.Context.ALARM_SERVICE;
 
 /**
  * Created by Mai_ on 08-Nov-16.
@@ -81,10 +88,42 @@ public class MedicineCursorAdapter extends CursorRecyclerViewAdapter<MedicineCur
         final int frequency = cursor.getInt(cursor.getColumnIndex(MedicineColumns.FREQUENCY));
         final float doses = cursor.getFloat(cursor.getColumnIndex(MedicineColumns.NO_DOSAGE));
         final int duration = cursor.getInt(cursor.getColumnIndex(MedicineColumns.DURATION));
+        final int Days = cursor.getInt(cursor.getColumnIndex(MedicineColumns.DAYS));
 
         viewHolder.medicine_name.setText(name);
         viewHolder.no_dosage.setText(mContext.getString(R.string.doses,doses));
-        viewHolder.frequency.setText(mContext.getString(R.string.frequency_medicine_list,frequency));
+        switch (Days){
+            //daily
+            case 0:
+                viewHolder.frequency.setText(mContext.getString(R.string.frequency_medicine_list,
+                        frequency));
+                break;
+            case 1:
+                viewHolder.frequency.setText("weekly");
+                break;
+            case 2:
+                viewHolder.frequency.setText("monthly");
+                break;
+            case 3:
+                cursor = mContext.getContentResolver().query(MedicineProvider.MedicinesDays.
+                                withId(id), null,
+                        MedicineDaysColumns.MED_ID+"=?",new String[]
+                                {String.valueOf(id)},null);
+                Integer[] selectedDaysInPicker = new Integer[cursor.getCount()];
+
+                if (cursor.moveToFirst()){
+                    int i=0;
+                    do {
+                        selectedDaysInPicker[i] = cursor.getInt(cursor.getColumnIndex
+                                (MedicineDaysColumns.DAYS));
+                        i++;
+                    }while (cursor.moveToNext());
+                    viewHolder.frequency.setText(Utilities.showCertainDaysWeekString(
+                            selectedDaysInPicker,mContext));
+                }
+                break;
+
+        }
         switch (duration){
             case 0:
                 viewHolder.duration.setText(mContext.getString(R.string.continuous));
@@ -109,6 +148,13 @@ public class MedicineCursorAdapter extends CursorRecyclerViewAdapter<MedicineCur
                                                 Medicines.withId(name),null,null);
                                         mContext.getContentResolver().delete(MedicineProvider.
                                                 MedicinesDays.withId(id),null,null);
+                                        Intent AlarmIntent = new Intent(mContext,AlarmReceiver.class);
+                                        AlarmManager alarmManager = (AlarmManager) mContext.
+                                                getSystemService(ALARM_SERVICE);
+                                        PendingIntent pending_intent = PendingIntent.
+                                                getBroadcast(mContext,id,AlarmIntent,PendingIntent.
+                                                FLAG_UPDATE_CURRENT);
+                                        alarmManager.cancel(pending_intent);
                                     }
                                 }
                             })

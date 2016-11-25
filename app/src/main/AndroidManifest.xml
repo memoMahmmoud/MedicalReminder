@@ -24,6 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".EditMedicine"></activity>
+        <receiver android:name=".alarm_medicine.AlarmReceiver"/>
+        <service android:name=".alarm_medicine.RingtonePlayingService" android:enabled="true"/>
     </application>
 
 </manifest>

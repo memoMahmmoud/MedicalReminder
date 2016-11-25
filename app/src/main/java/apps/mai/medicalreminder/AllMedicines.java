@@ -9,7 +9,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
 import apps.mai.medicalreminder.data.MedicineProvider;
 import apps.mai.medicalreminder.rest.MedicineCursorAdapter;
@@ -37,10 +36,6 @@ public class AllMedicines extends AppCompatActivity implements
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(medicineCursorAdapter);
         getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null,this);
-
-        Cursor cursor = getContentResolver().query(MedicineProvider.MedicinesDays.
-                MEDICINES_DAYS,null,null,null,null);
-        Toast.makeText(this,""+cursor.getCount(),Toast.LENGTH_SHORT).show();
 
     }
     @OnClick(R.id.fab_add)

@@ -1,5 +1,7 @@
 package apps.mai.medicalreminder;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -26,6 +28,7 @@ import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.Calendar;
 
+import apps.mai.medicalreminder.alarm_medicine.AlarmReceiver;
 import apps.mai.medicalreminder.data.MedicineColumns;
 import apps.mai.medicalreminder.data.MedicineDaysColumns;
 import apps.mai.medicalreminder.data.MedicineProvider;
@@ -81,6 +84,9 @@ public class EditMedicine extends AppCompatActivity implements
     MaterialBetterSpinner reminderTimesSpinner;
     int medicine_id;
 
+    AlarmManager alarmManager;
+    private PendingIntent pending_intent;
+    Intent AlarmIntent;
 
 
     @Override
@@ -89,6 +95,10 @@ public class EditMedicine extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_medicine);
         ButterKnife.bind(this);
+        calendar = Calendar.getInstance();
+
+        AlarmIntent = new Intent(this,AlarmReceiver.class);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         save_medicine.setText(R.string.edit_medicine);
         final ArrayAdapter<String> reminderTimesAdapter = new ArrayAdapter<String>(this,
@@ -307,13 +317,35 @@ public class EditMedicine extends AppCompatActivity implements
                 getContentResolver().delete(MedicineProvider.MedicinesDays.withId(medicine_id),
                         null,null);
                 for (int i=0;i<selectedDaysInPicker.length;i++){
-                    Toast.makeText(getBaseContext(),""+selectedDaysInPicker[i],Toast.LENGTH_SHORT).show();
                     ContentValues contentValues1 = new ContentValues();
                     contentValues1.put(MedicineDaysColumns.MED_ID,medicine_id);
                     contentValues1.put(MedicineDaysColumns.DAYS,selectedDaysInPicker[i]);
                     getContentResolver().insert(MedicineProvider.MedicinesDays.withId(medicine_id),
                             contentValues1);
                 }
+            }
+            AlarmIntent.putExtra("med_id",medicine_id);
+            pending_intent = PendingIntent.getBroadcast(this,medicine_id,AlarmIntent,PendingIntent.
+                    FLAG_UPDATE_CURRENT);
+            alarmManager.cancel(pending_intent);
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            switch (Days){
+                //every day
+                case 0:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_HOUR*frequency,pending_intent);
+                    break;
+                //every week
+                case 1:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY*7,pending_intent);
+                    break;
+                //every month
+                case 2:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY*30,pending_intent);
+                    break;
             }
             Intent intent = new Intent(this,AllMedicines.class);
             startActivity(intent);

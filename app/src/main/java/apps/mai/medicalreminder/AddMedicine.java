@@ -72,15 +72,18 @@ public class AddMedicine extends AppCompatActivity implements
     RadioButton days_every_day;
     MaterialBetterSpinner reminderTimesSpinner;
 
+    Intent AlarmIntent;
     AlarmManager alarmManager;
     private PendingIntent pending_intent;
-    private AlarmReceiver alarm;
     Intent medicineIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_medicine);
         ButterKnife.bind(this);
+
+        AlarmIntent = new Intent(this,AlarmReceiver.class);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         medicineIntent = new Intent(this, AlarmReceiver.class);
         hour = Integer.parseInt(getString(R.string.initial_hour));
@@ -245,11 +248,12 @@ public class AddMedicine extends AppCompatActivity implements
             else
                 getContentResolver().update(MedicineProvider.Medicines.withId(name),
                     contentValues,null,null);
+            cursor = getContentResolver().query(MedicineProvider.Medicines.withId(name),
+                    null,null,null,null);
+            cursor.moveToFirst();
+            int id = cursor.getInt(cursor.getColumnIndex(MedicineColumns._ID));
+
             if (Days ==3){
-                cursor = getContentResolver().query(MedicineProvider.Medicines.withId(name),
-                        null,null,null,null);
-                if (cursor.moveToFirst()){
-                    int id = cursor.getInt(cursor.getColumnIndex(MedicineColumns._ID));
                     int i=0;
                     do {
                         ContentValues contentValues1 = new ContentValues();
@@ -259,8 +263,31 @@ public class AddMedicine extends AppCompatActivity implements
                                 contentValues1);
                     }while (cursor.moveToNext());
 
-                }
+
             }
+            AlarmIntent.putExtra("med_id",id);
+            pending_intent = PendingIntent.getBroadcast(this,id,AlarmIntent,PendingIntent.
+                    FLAG_UPDATE_CURRENT);
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            switch (Days){
+                //every day
+                case 0:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_HOUR*frequency,pending_intent);
+                    break;
+                //every week
+                case 1:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY*7,pending_intent);
+                    break;
+                //every month
+                case 2:
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY*30,pending_intent);
+                    break;
+            }
+
             Intent intent = new Intent(this,AllMedicines.class);
             startActivity(intent);
         }
@@ -268,6 +295,8 @@ public class AddMedicine extends AppCompatActivity implements
             Toast.makeText(this,R.string.medicine_empty,Toast.LENGTH_SHORT).show();
         }
     }
+    //cancel pending intent
+    //cancel ringtone through sendBroadcast(myIntent);
 
 
 
